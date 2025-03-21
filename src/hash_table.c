@@ -1,42 +1,43 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "hash_table.h"
+
 #define TABLE_SIZE 1000
 
-//this code mainly handles the storage of shortened urls.
-
-typedef struct url_node{
+typedef struct Entry {
     char short_url[7];
     char long_url[2048];
-    struct url_node* next;  // Added the missing next pointer
-} url_node;
+    struct Entry* next;
+} Entry;
 
-url_node* hash_table[TABLE_SIZE] = {NULL};  
+Entry* hash_table[TABLE_SIZE];
 
-unsigned int hash_function(const char* str){
-    unsigned int hash  = 5381;
-    while(*str)
-        hash = ((hash << 5) + hash) + *str++;
+unsigned int hash(const char* key) {
+    unsigned int hash = 0;
+    while (*key) {
+        hash = (hash * 31) + *key++;
+    }
     return hash % TABLE_SIZE;
 }
 
-void insert_url(const char* short_url,const char*long_url){
-    unsigned int index = hash_function(short_url);
-    url_node* new_node = (url_node*)malloc(sizeof(url_node));
-    strcpy(new_node->short_url,short_url);
-    strcpy(new_node->long_url,long_url);
-    new_node->next = hash_table[index];
-    hash_table[index] = new_node;
+void insert_url(const char* short_url, const char* long_url) {
+    unsigned int index = hash(short_url);
+    Entry* new_entry = (Entry*)malloc(sizeof(Entry));
+    strcpy(new_entry->short_url, short_url);
+    strcpy(new_entry->long_url, long_url);
+    new_entry->next = hash_table[index];
+    hash_table[index] = new_entry;
 }
 
-char* get_url(const char* short_url){
-    unsigned int index = hash_function(short_url);
-    url_node* current = hash_table[index];
-    while(current){
-        if(strcmp(current->short_url,short_url) == 0)
-            return current->long_url;
-        current = current->next;
+char* lookup_url(const char* short_url) {  // Function remains as lookup_url
+    unsigned int index = hash(short_url);
+    Entry* entry = hash_table[index];
+    while (entry) {
+        if (strcmp(entry->short_url, short_url) == 0) {
+            return entry->long_url;  // Return the long URL
+        }
+        entry = entry->next;
     }
-    return NULL;
+    return "Not Found";  // URL not found
 }
