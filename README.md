@@ -22,3 +22,5 @@ A simple URL shortener implemented in C using a hash table for storing mappings 
 gcc -o server.exe src/server.c src/hash_table.c src/url_shortener.c -Iinclude -lws2_32
 gcc -o client.exe src/client.c -Iinclude -lws2_32
 ```
+ -then run ./server.exe in one terminal and ./clinet.exe in another terminal 
+ 
